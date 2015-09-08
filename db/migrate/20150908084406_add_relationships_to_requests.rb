@@ -1,7 +1,6 @@
 class AddRelationshipsToRequests < ActiveRecord::Migration
   def change
-    add_reference :requests, :user, references: :users, index: true
-    add_foreign_key :requests, :users
+    add_reference :requests, :user, references: :users, index: true, foreign_key: true
 
     add_reference :requests, :valet_pick_up, references: :valets, index: true
     add_foreign_key :requests, :valets, column: :valet_pick_up_id

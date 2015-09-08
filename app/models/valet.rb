@@ -5,7 +5,7 @@ class Valet < ActiveRecord::Base
           :confirmable, :omniauthable
   include DeviseTokenAuth::Concerns::User
 
-  has_many :logs
+  has_many :valet_logs
   has_many :requests
   
 end
