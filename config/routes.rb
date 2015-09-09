@@ -6,4 +6,5 @@ Rails.application.routes.draw do
     # Define routes for Valet within this block.
   end
   root 'static_pages#index'
+  resources 'requests', :path => 'api/v1/requests'
 end
