@@ -64,13 +64,13 @@ class Request < ActiveRecord::Base
   end
 
   def remove_valet_pick_up
-    unless self.valet_pick_up = nil
+    unless self.valet_pick_up.nil?
       self.update(valet_pick_up:  nil)
     end
   end
 
   def remove_valet_drop_off
-    unless self.valet_drop_off = nil
+    unless self.valet_drop_off.nil?
       self.update(valet_drop_off:  nil)
     end
   end
@@ -82,6 +82,10 @@ class Request < ActiveRecord::Base
     else
       self.update(auth_code_pick_up: auth_code)
     end
+  end
+
+  def find_nearest_parking
+    self.update(parking_location: ParkingLot.near(self.source_location, 10, units: :km).first)
   end
 
   belongs_to :user

@@ -5,8 +5,7 @@ class RequestsController < ApplicationController
     user_id = params[:user_id]
     user = User.find(user_id)
     request_params = request_create_params
-    location = request_params[:source_location].split(',')
-    new_location = Location.new({coordinates:[ location[0], location[1]], address: request_params[:address], category: "Random"})
+    new_location = Location.new({address: request_params[:address]})
     if new_location.save
       # save successfuly, create the request
       request_hash = Hash.new
@@ -34,6 +33,8 @@ class RequestsController < ApplicationController
       @request.pick_up_retrieved!
       # Generate authentication code
       @request.generate_auth_code
+      # find the nearest parking lot
+      @request.find_nearest_parking
     else
       render 'record_already_responded', status: :bad_request
     end

@@ -14,6 +14,5 @@ json.array! @requests do |request|
   end
   json.source_location do
     json.address          request.source_location.address
-    json.coordinates      request.source_location.coordinates
   end
 end
