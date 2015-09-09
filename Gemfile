@@ -12,13 +12,9 @@ gem 'omniauth'
 gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'dotenv-rails'
-<<<<<<< HEAD
 gem 'rack-cors', :require => 'rack/cors'
 gem 'aasm'
 gem 'geocoder'
-=======
-gem 'aasm'
->>>>>>> f4106f8beaba8e0607966f781ee3d90a7b68c4f3
 
 group :development, :test do
   gem 'byebug'
@@ -28,3 +24,4 @@ group :development, :test do
   gem 'web-console', '~> 2.0'
   gem 'spring'
 end
+  
