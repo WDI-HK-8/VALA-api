@@ -2,10 +2,15 @@ class ValetsController < ApplicationController
 
   def update
     @valet = Valet.find_by_id(params[:id])
+    
     if @valet.nil?
       render json: {message: "404 Not Found"}
-    else
-      @valet.update(valet_params)
+    
+    elsif @valet.update(valet_params) 
+      render :show 
+
+    else render json: {message: "402 Bad Request"}
+
     end
   end
 
@@ -22,6 +27,7 @@ class ValetsController < ApplicationController
 
   def available
     @valets = Valet.where(status: "available")
+    render :index
   end
 
 
