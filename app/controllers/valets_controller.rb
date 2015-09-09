@@ -1,3 +1,4 @@
+
 class ValetsController < ApplicationController
 
   def update
@@ -35,6 +36,5 @@ class ValetsController < ApplicationController
   def valet_params
     params.require(:valet).permit(:email, :password, :confirm_password, :phone_number, :driving_license_exp_date, :manual, :status)
   end
-
-
 end
+

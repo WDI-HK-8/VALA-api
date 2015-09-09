@@ -7,5 +7,6 @@ json.phone_number         @valet.phone_number
 json.manual               @valet.manual
 json.status               @valet.status
 json.years_of_driving     @valet.years_of_driving
+json.driver_license_expiry_date     @valet.driver_license_expiry_date
 json.updated_at           @valet.updated_at
 
