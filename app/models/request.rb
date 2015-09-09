@@ -65,13 +65,22 @@ class Request < ActiveRecord::Base
 
   def remove_valet_pick_up
     unless self.valet_pick_up = nil
-      self.valet_pick_up = nil
+      self.update(valet_pick_up:  nil)
     end
   end
 
   def remove_valet_drop_off
     unless self.valet_drop_off = nil
-      self.valet_drop_off = nil
+      self.update(valet_drop_off:  nil)
+    end
+  end
+
+  def generate_auth_code(drop_off = false)
+    auth_code = '%04d' % rand(10 ** 4)
+    if drop_off
+      self.update(auth_code_drop_off: auth_code)
+    else
+      self.update(auth_code_pick_up: auth_code)
     end
   end
 
