@@ -20,4 +20,5 @@ Rails.application.routes.draw do
   post 'api/v1/users/:user_id/requests' => 'requests#create'
 
   resources 'requests', :path => 'api/v1/requests'
+  post 'api/v1/users/:user_id/requests' => 'requests#create'
 end
