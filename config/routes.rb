@@ -15,4 +15,5 @@ Rails.application.routes.draw do
     end
   end  
 
+  resources 'requests', :path => 'api/v1/requests'
 end
