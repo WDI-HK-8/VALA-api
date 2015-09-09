@@ -8,4 +8,6 @@ Rails.application.routes.draw do
   root 'static_pages#index'
 
   post 'api/v1/users/:user_id/requests' => 'requests#create'
+
+  get 'api/v1/requests/pickup' => 'requests#index_pick_up'
 end
