@@ -19,5 +19,5 @@ Rails.application.routes.draw do
   resources 'requests', :path => 'api/v1/requests'
   post 'api/v1/users/:user_id/requests' => 'requests#create'
 
-  get 'api/v1/requests/pickup' => 'requests#index_pick_up'
+  resources 'requests', :path => 'api/v1/requests'
 end
