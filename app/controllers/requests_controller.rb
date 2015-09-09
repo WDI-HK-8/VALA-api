@@ -15,7 +15,6 @@ class RequestsController < ApplicationController
       unless @request.save 
         render json: {error: "Request not saved"}, status: :bad_request
       end
-
     else
       # location not save
       render json: {error: "Location not saved"}, status: :bad_request
@@ -43,7 +42,6 @@ class RequestsController < ApplicationController
     def request_create_params
       params.require(:request).permit(:source_location, :address)
     end
-
     def record_not_found
       render 'record_not_found', status: :bad_request
     end
