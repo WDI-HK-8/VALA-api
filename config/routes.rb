@@ -6,4 +6,13 @@ Rails.application.routes.draw do
     # Define routes for Valet within this block.
   end
   root 'static_pages#index'
+
+  scope '/api/v1' do
+    resources :valets, only: [:update, :show, :index] do
+      collection do
+        get 'available'
+      end
+    end
+  end  
+
 end
