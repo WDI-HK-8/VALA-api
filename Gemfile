@@ -14,6 +14,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'dotenv-rails'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'aasm'
+gem 'geocoder'
 
 group :development, :test do
   gem 'byebug'
