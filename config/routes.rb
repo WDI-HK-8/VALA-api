@@ -16,4 +16,5 @@ Rails.application.routes.draw do
     end
     resources :users
   end  
+  resources 'requests', :path => 'api/v1/requests'
 end
