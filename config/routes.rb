@@ -23,7 +23,8 @@ Rails.application.routes.draw do
   post 'api/v1/users/:user_id/requests' => 'requests#create'
   put 'api/v1/valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
 
-  patch 'api/v1/valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
+    patch 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
 
-  get 'api/v1/requests/pickup' => 'requests#index_pick_up'
+    get 'requests/pickup' => 'requests#index_pick_up'
+  end  
 end
