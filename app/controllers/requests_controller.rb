@@ -48,6 +48,10 @@ class RequestsController < ApplicationController
     def request_create_params
       params.require(:request).permit(:latitude,:longitude)
     end
+<<<<<<< HEAD
+
+=======
+>>>>>>> 3eef4065951a149dc4ab74a67fc24b6a3a425868
     def record_not_found
       render 'record_not_found', status: :bad_request
     end
