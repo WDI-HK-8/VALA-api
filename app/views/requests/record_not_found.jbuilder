@@ -1,1 +1,1 @@
-json.error "User not found"
+json.error "Data not found"
