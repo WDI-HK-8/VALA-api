@@ -1,7 +1,7 @@
 json.valet_id_pick_up @request.valet_pick_up.id
 json.user do
   json.id             @request.user.id
-  json.name           @request.user.first_name} + @request.user.last_name
+  json.name           "#{@request.user.first_name} #{@request.user.last_name}"
   json.phone_number   @request.user.phone_number
   json.car do
     json.picture      @request.user.car_picture
