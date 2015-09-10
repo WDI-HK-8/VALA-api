@@ -1,5 +1,10 @@
 class RequestsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
+  
+  def index
+    @requests = Request.all
+  end
+
   def create
     #create location entered
     user_id = params[:user_id]
