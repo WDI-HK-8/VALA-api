@@ -77,6 +77,16 @@ class RequestsController < ApplicationController
     @request.record_time(true)
   end
 
+  def valet_drop_off
+    valet = Valet.find(params[:valet_id])
+    @request = Request.find(params[:id])
+    @request.update(valet_drop_off: valet)
+  end
+
+  def valet_delivery
+    @request.generate_auth_code(true)
+  end
+
   private
     def request_create_params
       params.require(:request).permit(:latitude,:longitude)
