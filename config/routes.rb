@@ -14,14 +14,8 @@ Rails.application.routes.draw do
         get 'available'
       end
     end
-    resources :users
-  end  
-  resources 'requests', :path => 'api/v1/requests'
-  post 'api/v1/users/:user_id/requests' => 'requests#create'
-
-  resources 'requests', :path => 'api/v1/requests'
-  post 'api/v1/users/:user_id/requests' => 'requests#create'
-  put 'api/v1/valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
+    post 'users/:user_id/requests' => 'requests#create'
+    put 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
 
     patch 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
 
