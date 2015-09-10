@@ -13,6 +13,8 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'dotenv-rails'
 gem 'rack-cors', :require => 'rack/cors'
+gem 'aasm'
+gem 'geocoder'
 
 group :development, :test do
   gem 'byebug'
@@ -22,3 +24,4 @@ group :development, :test do
   gem 'web-console', '~> 2.0'
   gem 'spring'
 end
+  
