@@ -7,14 +7,13 @@ class Request < ActiveRecord::Base
     state :car_parked
     state :request_drop_off
     state :valet_drop_off
-    state :in_transit_drop_off
-    state :car_drop_off
+    state :e
     state :rating
     state :completed
-    state :cancelled, :before_enter => :remove_valet_pick_up
+    state :cancelled, :after => :remove_valet_pick_up
 
     event :cancel_pick_up do
-      transitions :from => [:request_pick_up, :car_pick_up], :to => :cancelled
+      transitions :from => [:request_pick_up, :valet_pick_up], :to => :cancelled
     end
 
     event :cancel_drop_off do
@@ -46,11 +45,7 @@ class Request < ActiveRecord::Base
     end
 
     event :auth_code_matched_drop_off do
-      transitions :from => :in_transit_drop_off, :to => :car_drop_off
-    end
-
-    event :transaction_complete do
-      transitions :from => :car_drop_off, :to => :rating
+      transitions :from => :in_transit_drop_off, :to => :rating
     end
 
     event :rating_complete do
@@ -58,15 +53,25 @@ class Request < ActiveRecord::Base
     end
   end
 
+  def cancel
+    if self.status == "valet_pick_up" || "request_pick_up"
+      self.cancel_pick_up!
+    elsif self.status == "request_drop_off" || "valet_drop_off"
+      self.cancel_drop_off!
+    end
+  end
+
   def remove_valet_pick_up
     unless self.valet_pick_up.nil?
-      self.update(valet_pick_up:  nil)
+      self.update(valet_pick_up:  nil,
+      car_pick_up_time: nil)
     end
   end
 
   def remove_valet_drop_off
     unless self.valet_drop_off.nil?
-      self.update(valet_drop_off:  nil)
+      self.update(valet_drop_off:  nil,
+        request_drop_off_time: nil)
     end
   end
 
@@ -86,6 +91,15 @@ class Request < ActiveRecord::Base
   def record_time(dropoff = false)
     current_time = Time.now
     dropoff ? self.update(request_drop_off_time: current_time) : self.update(car_pick_up_time: current_time)
+  end
+
+  def calculate_total
+    num = ((self.request_drop_off_time - self.car_pick_up_time)/3600).ceil * 50
+    self.update(total: num)
+  end
+
+  def get_payment
+    self.total + self.tip
   end
 
   belongs_to :user
