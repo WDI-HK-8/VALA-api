@@ -5,7 +5,7 @@ class RequestsController < ApplicationController
     user_id = params[:user_id]
     user = User.find(user_id)
     request_params = request_create_params
-    new_location = Location.new({address: request_params[:address]})
+    new_location = Location.new(longitude: request_params[:longitude], latitude: request_params[:latitude])
     if new_location.save
       # save successfuly, create the request
       request_hash = Hash.new
@@ -42,7 +42,7 @@ class RequestsController < ApplicationController
 
   private
     def request_create_params
-      params.require(:request).permit(:source_location, :address)
+      params.require(:request).permit(:latitude,:longitude)
     end
 
     def record_not_found
