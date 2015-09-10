@@ -13,6 +13,11 @@ Rails.application.routes.draw do
         get 'available'
       end
     end
-  end  
+    post 'users/:user_id/requests' => 'requests#create'
+    put 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
 
+    patch 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
+
+    get 'requests/pickup' => 'requests#index_pick_up'
+  end  
 end
