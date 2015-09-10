@@ -10,14 +10,25 @@ Rails.application.routes.draw do
   scope '/api/v1' do
     resources :valets, only: [:update, :show, :index] do
       collection do
-        get 'available'
+        get 'available' 
       end
     end
-    post 'users/:user_id/requests' => 'requests#create'
-    put 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
-
-    patch 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
-
     get 'requests/pickup' => 'requests#index_pick_up'
+    post 'users/:user_id/requests' => 'requests#create'
+    put 'users/:user_id/requests/:id/car_pick_up' => 'requests#car_pick_up'
+    patch 'users/:user_id/requests/:id/car_pick_up' => 'requests#car_pick_up'
+    put 'users/:user_id/requests/:id/request_drop_off' => 'requests#request_drop_off'
+    patch 'users/:user_id/requests/:id/request_drop_off' => 'requests#request_drop_off'
+    
+    put 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
+    patch 'valets/:valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
+    put 'valets/:valet_id/requests/:id/car_parked' => 'requests#car_parked'
+    patch 'valets/:valet_id/requests/:id/car_parked' => 'requests#car_parked'
+    put 'valets/:valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
+    patch 'valets/:valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
+
+
+
+
   end  
 end
