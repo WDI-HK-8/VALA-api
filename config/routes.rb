@@ -26,6 +26,8 @@ Rails.application.routes.draw do
     patch 'valets/:valet_id/requests/:id/car_parked' => 'requests#car_parked'
     put 'valets/:valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
     patch 'valets/:valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
+    put 'valets/:valet_id/requests/:id/valet_delivery' => 'requests#valet_delivery'
+    patch 'valets/:valet_id/requests/:id/valet_delivery' => 'requests#valet_delivery'
 
 
 

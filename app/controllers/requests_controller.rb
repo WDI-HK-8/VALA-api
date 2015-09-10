@@ -67,7 +67,7 @@ class RequestsController < ApplicationController
     @request.keys_dropped!
     render json: {}, status: :no_content
   end
- 
+  #user requests drop off
   def request_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:id])
     destination = request_create_params
@@ -76,15 +76,19 @@ class RequestsController < ApplicationController
     @request.update(destination_location: destination_location)
     @request.record_time(true)
   end
-
+  #valet accepts drop off
   def valet_drop_off
     valet = Valet.find(params[:valet_id])
     @request = Request.find(params[:id])
+    @request.drop_off_retrieved!
     @request.update(valet_drop_off: valet)
   end
-
+  #valet has arrived at the car
   def valet_delivery
+    valet = Valet.find(params[:valet_id])
+    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:id])
     @request.generate_auth_code(true)
+    @request.valet_on_route_drop_off!
   end
 
   private
