@@ -6,7 +6,11 @@ class UsersController < ApplicationController
     if @user.nil?
       render json: {message: "User Not Found"}, status: :not_found
     else
-      @user.update(user_params)
+      if @user.update(user_params)
+        render :show
+      else 
+        render json: {message: @user.error.messages}, status: :bad_request
+      end
     end
 
   end
@@ -18,8 +22,6 @@ class UsersController < ApplicationController
       render json: {message: "User Not Found"}, status: :not_found
     end
   end
-
-
 
   private
 
