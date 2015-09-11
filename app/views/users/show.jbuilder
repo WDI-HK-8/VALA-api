@@ -1,0 +1,12 @@
+json.id               @user.id
+json.first_name       @user.first_name
+json.last_name        @user.last_name
+json.profile_picture  @user.profile_picture
+json.email            @user.email
+json.phone_number     @user.phone_number
+json.car_picture      @user.car_picture
+json.car_color        @user.car_color
+json.car_make         @user.car_make
+json.car_license_plate @user.car_license_plate
+json.is_manual        @user.is_manual
+json.updated_at       @user.updated_at
