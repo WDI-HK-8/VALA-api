@@ -99,7 +99,7 @@ class RequestsController < ApplicationController
   def car_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:id])
     auth_code = request_auth_code_params[:auth_code]
-    if @request.auth_code_check?(auth_code, true)
+    if @request.auth_code_check?(auth_code)
       @request.auth_code_matched_drop_off!
       render 'okay'
     else
