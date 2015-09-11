@@ -39,7 +39,7 @@ class RequestsController < ApplicationController
       @request.update(valet_pick_up: valet)
       @request.pick_up_retrieved!
       # Generate authentication code
-      @request.generate_auth_code
+      @request.generate_auth_code("pick_up")
       # find the nearest parking lot
       @request.find_nearest_parking
     else
@@ -51,8 +51,8 @@ class RequestsController < ApplicationController
   def car_pick_up
     @request = User.find(params[:user_id]).requests.find(params[:id])
     auth_code = request_auth_code_params[:auth_code]
-    if @request.auth_code_check?(auth_code)
-      @request.record_time
+    if @request.auth_code_check?(auth_code, "pick_up")
+      @request.record_time("pick_up")
       @request.auth_code_matched_pick_up!
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request
@@ -72,10 +72,10 @@ class RequestsController < ApplicationController
   def request_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:id])
     destination = request_create_params
-    @request.drop_off_requested
+    @request.drop_off_requested!
     destination_location = Location.new(latitude: destination[:latitude], longitude: destination[:longitude])
     @request.update(destination_location: destination_location)
-    @request.record_time(true)
+    @request.record_time
     @request.calculate_total
   end
   #valet accepts drop off
@@ -91,7 +91,7 @@ class RequestsController < ApplicationController
   def valet_delivery
     valet = Valet.find(params[:valet_id])
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:id])
-    @request.generate_auth_code(true)
+    @request.generate_auth_code
     @request.valet_on_route_drop_off!
   end
 

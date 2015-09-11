@@ -7,7 +7,7 @@ class Request < ActiveRecord::Base
     state :car_parked
     state :request_drop_off
     state :valet_drop_off
-    state :e
+    state :in_transit_drop_off
     state :rating
     state :completed
     state :cancelled, :after => :remove_valet_pick_up
@@ -75,22 +75,22 @@ class Request < ActiveRecord::Base
     end
   end
 
-  def generate_auth_code(drop_off = false)
+  def generate_auth_code(drop_off = "drop_off")
     auth_code = '%04d' % rand(10 ** 4)
-    drop_off ? self.update(auth_code_drop_off: auth_code) : self.update(auth_code_pick_up: auth_code)
+    drop_off = "drop_off" ? self.update(auth_code_drop_off: auth_code) : self.update(auth_code_pick_up: auth_code)
   end
 
   def find_nearest_parking
     self.update(parking_location: ParkingLot.near(self.source_location, 10, units: :km).first)
   end
 
-  def auth_code_check?(auth_code, dropoff = false)
-    dropoff ? self.auth_code_drop_off == auth_code : self.auth_code_pick_up == auth_code
+  def auth_code_check?(auth_code, drop_off = "drop_off")
+    drop_off = "drop_off" ? self.auth_code_drop_off == auth_code : self.auth_code_pick_up == auth_code
   end
 
-  def record_time(dropoff = false)
+  def record_time(drop_off = "drop_off")
     current_time = Time.now
-    dropoff ? self.update(request_drop_off_time: current_time) : self.update(car_pick_up_time: current_time)
+    drop_off = "drop_off" ? self.update(request_drop_off_time: current_time) : self.update(car_pick_up_time: current_time)
   end
 
   def calculate_total

@@ -9,29 +9,32 @@ Rails.application.routes.draw do
 
   scope '/api/v1' do
     resources :valets, only: [:update, :show, :index] do
+      resources :requests, only: :update do
+        put 'valet_pick_up'
+        patch 'valet_pick_up'
+        put 'car_parked'
+        patch 'car_parked'
+        put 'valet_drop_off'
+        patch 'valet_drop_off'
+        put 'valet_delivery'
+        patch 'valet_delivery'
+      end
       collection do
         get 'available' 
-        put ':valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
-        patch ':valet_id/requests/:id/valet_pick_up' => 'requests#valet_pick_up'
-        put ':valet_id/requests/:id/car_parked' => 'requests#car_parked'
-        patch ':valet_id/requests/:id/car_parked' => 'requests#car_parked'
-        put ':valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
-        patch ':valet_id/requests/:id/valet_drop_off' => 'requests#valet_drop_off'
-        put ':valet_id/requests/:id/valet_delivery' => 'requests#valet_delivery'
-        patch ':valet_id/requests/:id/valet_delivery' => 'requests#valet_delivery'
       end
     end
 
-    scope 'users/:user_id/requests' do
-      post '/' => 'requests#create'
-      put ':id/car_pick_up' => 'requests#car_pick_up'
-      patch ':id/car_pick_up' => 'requests#car_pick_up'
-      put ':id/request_drop_off' => 'requests#request_drop_off'
-      patch ':id/request_drop_off' => 'requests#request_drop_off'
-      put ':id/car_drop_off' => 'requests#car_drop_off'
-      patch ':id/car_drop_off' => 'requests#car_drop_off'
-      put ':id/ratings' => 'requests#ratings'
-      patch ':id/ratings' => 'requests#ratings'
+    resources :users, only: :update do
+      resources :requests, only: [:update, :create] do
+        put 'car_pick_up'
+        patch 'car_pick_up'
+        put 'request_drop_off'
+        patch 'request_drop_off'
+        put 'car_drop_off'
+        patch 'car_drop_off'
+        put 'ratings'
+        patch 'ratings'
+      end
     end
 
     scope 'requests/' do
