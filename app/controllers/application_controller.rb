@@ -9,7 +9,11 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    devise_parameter_sanitizer.for(:sign_up) << [:first_name, :last_name, :profile_picture, :phone_number, :HKID, :driver_license_expiry_date, :years_of_driving, :manual, :status]
-    devise_parameter_sanitizer.for(:account_update) << [:profile_picture, :phone_number, :driver_license_expiry_date, :years_of_driving, :manual, :status]
+    if resource_class == User
+      devise_parameter_sanitizer.for(:sign_up) << [:first_name, :last_name, :profile_picture, :phone_number, :car_picture, :car_color, :car_make, :car_license_plate, :is_manual, :manual]
+    elsif resource_class == Valet
+      devise_parameter_sanitizer.for(:sign_up) << [:first_name, :last_name, :profile_picture, :phone_number, :HKID, :driver_license_expiry_date, :years_of_driving, :manual, :status]
+      devise_parameter_sanitizer.for(:account_update) << [:profile_picture, :phone_number, :driver_license_expiry_date, :years_of_driving, :manual, :status]
+    end
   end
 end
