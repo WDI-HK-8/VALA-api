@@ -34,7 +34,7 @@ class RequestsController < ApplicationController
   #valet puts their id into the request
   def valet_pick_up
     valet = Valet.find(params[:valet_id])
-    @request = Request.find(params[:id])
+    @request = Request.find(params[:request_id])
     if @request.valet_pick_up.nil?
       @request.update(valet_pick_up: valet)
       @request.pick_up_retrieved!

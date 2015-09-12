@@ -2,6 +2,7 @@ class Request < ActiveRecord::Base
   include AASM
   aasm :column => :status do 
     state :request_pick_up, :initial => true
+    state :car_pick_up
     state :valet_pick_up
     state :in_transit_pick_up
     state :car_parked
@@ -77,7 +78,7 @@ class Request < ActiveRecord::Base
 
   def generate_auth_code(drop_off = "drop_off")
     auth_code = '%04d' % rand(10 ** 4)
-    drop_off = "drop_off" ? self.update(auth_code_drop_off: auth_code) : self.update(auth_code_pick_up: auth_code)
+    drop_off == "drop_off" ? self.update(auth_code_drop_off: auth_code) : self.update(auth_code_pick_up: auth_code)
   end
 
   def find_nearest_parking
@@ -85,12 +86,12 @@ class Request < ActiveRecord::Base
   end
 
   def auth_code_check?(auth_code, drop_off = "drop_off")
-    drop_off = "drop_off" ? self.auth_code_drop_off == auth_code : self.auth_code_pick_up == auth_code
+    drop_off == "drop_off" ? self.auth_code_drop_off == auth_code : self.auth_code_pick_up == auth_code
   end
 
   def record_time(drop_off = "drop_off")
     current_time = Time.now
-    drop_off = "drop_off" ? self.update(request_drop_off_time: current_time) : self.update(car_pick_up_time: current_time)
+    drop_off == "drop_off" ? self.update(request_drop_off_time: current_time) : self.update(car_pick_up_time: current_time)
   end
 
   def calculate_total
