@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   scope '/api/v1' do
     resources :valets, only: [:update, :show, :index] do
+      post 'location' => 'trackings#valet_location'
       resources :requests, only: :update do
         put 'valet_pick_up'
         patch 'valet_pick_up'
@@ -25,6 +26,7 @@ Rails.application.routes.draw do
     end
 
     resources :users, only: :update do
+      post 'location' => 'trackings#user_location'
       resources :requests, only: [:update, :create] do
         put 'car_pick_up'
         patch 'car_pick_up'
