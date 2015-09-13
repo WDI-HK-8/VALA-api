@@ -18,6 +18,9 @@ class RequestsController < ApplicationController
       request_hash[:source_location] = new_location
       @request = user.requests.new(request_hash)
       #PRIVATE PUB publish to all valets. 
+      unless @request.save 
+        render json : {error: "Request not saved"}, status: :bad_request
+      end
       PrivatePub.publish_to "/valet/new", :request => {id: @request.id,
                                                       name: "#{@request.user.first_name} #{@request.user.last_name}",
                                                       picture: @request.user.profile_picture,
@@ -27,9 +30,6 @@ class RequestsController < ApplicationController
                                                       longitude: @request.source_location.longitude,
                                                       location: @request.source_location.address
                                                     }
-      unless @request.save 
-        render json: {error: "Request not saved"}, status: :bad_request
-      end
     else
       # location not save
       render json: {error: "Location not saved"}, status: :bad_request
