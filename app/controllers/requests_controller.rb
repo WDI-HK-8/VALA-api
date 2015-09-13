@@ -34,7 +34,7 @@ class RequestsController < ApplicationController
   #valet puts their id into the request
   def valet_pick_up
     valet = Valet.find(params[:valet_id])
-    @request = Request.find(params[:id])
+    @request = Request.find(params[:request_id])
     if @request.valet_pick_up.nil?
       @request.update(valet_pick_up: valet)
       @request.pick_up_retrieved!
@@ -49,7 +49,7 @@ class RequestsController < ApplicationController
 
   #user confirms auth code
   def car_pick_up
-    @request = User.find(params[:user_id]).requests.find(params[:id])
+    @request = User.find(params[:user_id]).requests.find(params[:request_id])
     auth_code = request_auth_code_params[:auth_code]
     if @request.auth_code_check?(auth_code, "pick_up")
       @request.record_time("pick_up")
@@ -63,14 +63,14 @@ class RequestsController < ApplicationController
   def car_parked
     valet = Valet.find(params[:valet_id])
     bay_number = valet_car_parked_params[:bay_number]
-    @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', valet.id, params[:id])
+    @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', valet.id, params[:request_id])
     @request.update(bay_number: bay_number)
     @request.keys_dropped!
     render 'okay'
   end
   #user requests drop off
   def request_drop_off
-    @request = User.find(params[:user_id]).requests.find(params[:id])
+    @request = User.find(params[:user_id]).requests.find(params[:request_id])
     destination = request_create_params
     @request.drop_off_requested!
     destination_location = Location.new(latitude: destination[:latitude], longitude: destination[:longitude])
@@ -81,7 +81,7 @@ class RequestsController < ApplicationController
   #valet accepts drop off
   def valet_drop_off
     valet = Valet.find(params[:valet_id])
-    @request = Request.find(params[:id])
+    @request = Request.find(params[:request_id])
     @request.drop_off_retrieved!
     @request.update(valet_drop_off: valet)
     @request.calculate_total
@@ -90,14 +90,14 @@ class RequestsController < ApplicationController
   #valet has arrived at the car
   def valet_delivery
     valet = Valet.find(params[:valet_id])
-    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:id])
+    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:request_id])
     @request.generate_auth_code
     @request.valet_on_route_drop_off!
   end
 
   #user keys in auth code
   def car_drop_off
-    @request = User.find(params[:user_id]).requests.find(params[:id])
+    @request = User.find(params[:user_id]).requests.find(params[:request_id])
     auth_code = request_auth_code_params[:auth_code]
     if @request.auth_code_check?(auth_code)
       @request.auth_code_matched_drop_off!
@@ -108,7 +108,7 @@ class RequestsController < ApplicationController
   end
 
   def ratings
-    @request = User.find(params[:user_id]).requests.find(params[:id])
+    @request = User.find(params[:user_id]).requests.find(params[:request_id])
     ratings = rating_params
     @request.update(tip: ratings[:tip], rating_pick_up: ratings[:pick_up], rating_drop_off: ratings[:drop_off])
     @request.rating_complete!
