@@ -88,6 +88,7 @@ class RequestsController < ApplicationController
     PrivatePub.publish_to "user/#{@request.id}", :chat_message => @request.status
     render 'okay'
   end
+  
   #user requests drop off
   def request_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:request_id])
