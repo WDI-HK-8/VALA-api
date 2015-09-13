@@ -1,6 +1,5 @@
 json.id           @request.id
-json.user_id      @request.user.first_name
-json.uid    @request.user.uid
+json.user_id      @request.user.id
 json.source_location do
   json.address     @request.source_location.address
   json.latitude    @request.source_location.latitude
