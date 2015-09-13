@@ -29,6 +29,7 @@ class RequestsController < ApplicationController
                                                       latitude: @request.source_location.latitude,
                                                       longitude: @request.source_location.longitude,
                                                       location: @request.source_location.address
+                                                      type: "pick_up"
                                                     }
     else
       # location not save
@@ -98,7 +99,16 @@ class RequestsController < ApplicationController
     @request.update(destination_location: destination_location)
     @request.record_time
     @request.calculate_total
-    PrivatePub.publish_to "valet/new", :chat_message => @request
+    PrivatePub.publish_to "/valet/new", :request => {id: @request.id,
+                                                name: "#{@request.user.first_name} #{@request.user.last_name}",
+                                                picture: @request.user.profile_picture,
+                                                transmission: @request.user.is_manual,
+                                                phone: @request.user.phone_number,
+                                                latitude: @request.desination_location.latitude,
+                                                longitude: @request.desination_location.longitude,
+                                                location: @request.desination_location.address
+                                                type: "drop_off"
+                                              }
   end
   #valet accepts drop off
   def valet_drop_off
