@@ -17,6 +17,8 @@ class RequestsController < ApplicationController
       request_hash = Hash.new
       request_hash[:source_location] = new_location
       @request = user.requests.new(request_hash)
+      #PRIVATE PUB publish to all valets. 
+      PrivatePub.publish_to "/valet/new", :chat_message => @request
       unless @request.save 
         render json: {error: "Request not saved"}, status: :bad_request
       end
@@ -42,6 +44,7 @@ class RequestsController < ApplicationController
       @request.generate_auth_code("pick_up")
       # find the nearest parking lot
       @request.find_nearest_parking
+      PrivatePub.publish_to "/user/#{@request.id}", :chat_message => @request.valet_pick_up
     else
       render 'record_already_responded', status: :bad_request
     end
@@ -54,6 +57,7 @@ class RequestsController < ApplicationController
     if @request.auth_code_check?(auth_code, "pick_up")
       @request.record_time("pick_up")
       @request.auth_code_matched_pick_up!
+      PrivatePub.publish_to "valet/#{@request.id}", :chat_message => @request.status
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request
     end
@@ -66,6 +70,7 @@ class RequestsController < ApplicationController
     @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', valet.id, params[:id])
     @request.update(bay_number: bay_number)
     @request.keys_dropped!
+    PrivatePub.publish_to "user/#{@request.id}", :chat_message => @request.status
     render 'okay'
   end
   #user requests drop off
@@ -77,6 +82,7 @@ class RequestsController < ApplicationController
     @request.update(destination_location: destination_location)
     @request.record_time
     @request.calculate_total
+    PrivatePub.publish_to "valet/new", :chat_message => @request
   end
   #valet accepts drop off
   def valet_drop_off
@@ -93,6 +99,7 @@ class RequestsController < ApplicationController
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:id])
     @request.generate_auth_code
     @request.valet_on_route_drop_off!
+    PrivatePub.publish_to "user/#{@request.id}", :chat_message => @request.status
   end
 
   #user keys in auth code
@@ -101,6 +108,7 @@ class RequestsController < ApplicationController
     auth_code = request_auth_code_params[:auth_code]
     if @request.auth_code_check?(auth_code)
       @request.auth_code_matched_drop_off!
+      PrivatePub.publish_to "valet/#{@request.id}", :chat_message => @request.status
       render 'okay'
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request      
@@ -112,12 +120,14 @@ class RequestsController < ApplicationController
     ratings = rating_params
     @request.update(tip: ratings[:tip], rating_pick_up: ratings[:pick_up], rating_drop_off: ratings[:drop_off])
     @request.rating_complete!
+    PrivatePub.publish_to "valet/#{@request.id}", :chat_message => @request.status
   end
 
   def cancel_request
     @request = Request.find(params[:id])
     @request.cancel
     render "okay"
+    PrivatePub.publish_to "valet/#{@request.id}", :chat_message => @request.status
   end
 
   private
