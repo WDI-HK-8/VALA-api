@@ -20,6 +20,16 @@ class RequestsController < ApplicationController
       unless @request.save 
         render json: {error: "Request not saved"}, status: :bad_request
       end
+      PrivatePub.publish_to "/valet/new", :request => {id: @request.id,
+                                                name: "#{@request.user.first_name} #{@request.user.last_name}",
+                                                picture: @request.user.profile_picture,
+                                                transmission: @request.user.is_manual,
+                                                phone: @request.user.phone_number,
+                                                latitude: @request.source_location.latitude,
+                                                longitude: @request.source_location.longitude,
+                                                location: @request.source_location.address,
+                                                type: "pick_up"
+                                              }
     else
       # location not save
       render json: {error: "Location not saved"}, status: :bad_request
