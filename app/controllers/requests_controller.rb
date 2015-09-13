@@ -33,6 +33,13 @@ class RequestsController < ApplicationController
     @requests = Request.where(status: "request_pick_up")
   end
 
+    #search for requesting dropoff
+  def index_drop_off
+    @requests = Request.where(status: "request_drop_off")
+    render :index_pick_up
+  end  
+  
+
   #valet puts their id into the request
   def valet_pick_up
     valet = Valet.find(params[:valet_id])
