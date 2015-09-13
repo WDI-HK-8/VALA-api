@@ -17,6 +17,7 @@ gem 'aasm'
 gem 'geocoder'
 #the regular private pub would not work.  Had to create own version of it and push it to ruby gems
 #due to validation of time stamp and sig.
+gem 'private_pub'
 gem 'private_pub_no_sig'
 gem "thin"
 
