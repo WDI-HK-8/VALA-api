@@ -28,7 +28,7 @@ class RequestsController < ApplicationController
                                                       phone: @request.user.phone_number,
                                                       latitude: @request.source_location.latitude,
                                                       longitude: @request.source_location.longitude,
-                                                      location: @request.source_location.address
+                                                      location: @request.source_location.address,
                                                       type: "pick_up"
                                                     }
     else
@@ -45,7 +45,7 @@ class RequestsController < ApplicationController
     #search for requesting dropoff
   def index_drop_off
     @requests = Request.where(status: "request_drop_off")
-    render :index_pick_up
+    render :index_drop_off
   end  
 
 
@@ -104,9 +104,9 @@ class RequestsController < ApplicationController
                                                 picture: @request.user.profile_picture,
                                                 transmission: @request.user.is_manual,
                                                 phone: @request.user.phone_number,
-                                                latitude: @request.desination_location.latitude,
-                                                longitude: @request.desination_location.longitude,
-                                                location: @request.desination_location.address
+                                                latitude: @request.destination_location.latitude,
+                                                longitude: @request.destination_location.longitude,
+                                                location: @request.destination_location.address,
                                                 type: "drop_off"
                                               }
   end
