@@ -14,7 +14,7 @@ class Request < ActiveRecord::Base
     state :cancelled, :after => :remove_valet_pick_up
 
     event :cancel_pick_up do
-      transitions :from => [:request_pick_up, :valet_pick_up], :to => :cancelled
+      transitions :from => [:request_pick_up, :car_pick_up], :to => :cancelled
     end
 
     event :cancel_drop_off do
