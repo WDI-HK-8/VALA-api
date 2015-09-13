@@ -45,7 +45,6 @@ class RequestsController < ApplicationController
     #search for requesting dropoff
   def index_drop_off
     @requests = Request.where(status: "request_drop_off")
-    render :index_drop_off
   end  
 
 
