@@ -144,10 +144,10 @@ class RequestsController < ApplicationController
 
   #user keys in auth code
   def car_drop_off
-    @request = User.find(params[:user_id]).requests.find(params[:request_id])
+    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', Valet.find(params[:valet_id]), params[:request_id])
     if @request.auth_code_check?(request_auth_code_params[:auth_code])
       @request.auth_code_matched_drop_off!
-      PrivatePub.publish_to "/valet/#{@request.id}", :status => @request.status
+      PrivatePub.publish_to "/user/#{@request.id}", :status => @request.status
       render 'okay'
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request      

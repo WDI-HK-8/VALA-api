@@ -18,6 +18,8 @@ Rails.application.routes.draw do
         patch 'valet_drop_off'
         put 'valet_delivery'
         patch 'valet_delivery'
+        put 'car_drop_off'
+        patch 'car_drop_off'
       end
       collection do
         get 'available' 
@@ -30,8 +32,6 @@ Rails.application.routes.draw do
         patch 'car_pick_up'
         put 'request_drop_off'
         patch 'request_drop_off'
-        put 'car_drop_off'
-        patch 'car_drop_off'
         put 'ratings'
         patch 'ratings'
       end
