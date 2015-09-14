@@ -122,9 +122,9 @@ class RequestsController < ApplicationController
       destination_latitude:       @request.destination_location.latitude,
       destination_longitude:      @request.destination_location.longitude,
       destination_location:       @request.destination_location.address,
-      parking_lot_latitude:       @request.parking_lot.latitude,
-      parking_lot_longitude:      @request.parking_lot.longitude,
-      parking_lot_location:       @request.parking_lot.address,
+      parking_location_latitude:  @request.parking_location.latitude,
+      parking_location_longitude: @request.parking_location.longitude,
+      parking_location_location:  @request.parking_location.address,
       type:                       "drop_off"
     }
   end
