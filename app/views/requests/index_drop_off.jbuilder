@@ -18,8 +18,8 @@ json.array! @requests do |request|
     json.longitude        request.parking_location.longitude 
   end
   json.destination_location do
-    json.address          request.source_location.address
-    json.latitude         request.source_location.latitude
-    json.longitude        request.source_location.longitude 
+    json.address          request.destination_location.address
+    json.latitude         request.destination_location.latitude
+    json.longitude        request.destination_location.longitude 
   end
 end
