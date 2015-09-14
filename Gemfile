@@ -15,6 +15,10 @@ gem 'dotenv-rails'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'aasm'
 gem 'geocoder'
+gem 'private_pub'
+gem 'private_pub_no_sig'
+gem "thin"
+
 
 group :development, :test do
   gem 'byebug'
