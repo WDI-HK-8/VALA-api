@@ -5,6 +5,6 @@ test:
   server: "http://localhost:9292/faye"
   secret_token: "secret"
 production:
-  server: <%= ENV["FAYE_PRODUCTION_URL"] %>
-  secret_token: <%= ENV["FAYE_SECRET_TOKEN"] %>
+  server: "https://vala-app-faye.herokuapp.com/faye"
+  secret_token: "secret"
   signature_expiration: 3600 # one hour
