@@ -17,11 +17,12 @@ ActiveRecord::Schema.define(version: 20150908084406) do
   enable_extension "plpgsql"
 
   create_table "locations", force: :cascade do |t|
-    t.string   "category"
     t.string   "address"
-    t.string   "coordinates", default: [],              array: true
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.decimal  "latitude"
+    t.decimal  "longitude"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string   "type"
   end
 
   create_table "requests", force: :cascade do |t|
