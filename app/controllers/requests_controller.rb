@@ -10,30 +10,26 @@ class RequestsController < ApplicationController
 
   def create
     #create location entered
-    user_id = params[:user_id]
-    user = User.find(user_id)
-    request_params = request_create_params
-    new_location = Location.new(longitude: request_params[:longitude], latitude: request_params[:latitude])
+    user = User.find(params[:user_id])
+    new_location = Location.new(longitude: request_create_params[:longitude], latitude: request_create_params[:latitude])
     if new_location.save
-      # save successfuly, create the request
-      request_hash = Hash.new
-      request_hash[:source_location] = new_location
-      @request = user.requests.new(request_hash)
-      unless @request.save 
+      @request = user.requests.new(source_location: new_location)
+      if @request.save
+        request =  {
+          id:             @request.id,
+          name:           "#{@request.user.first_name} #{@request.user.last_name}",
+          picture:        @request.user.profile_picture,
+          transmission:   @request.user.is_manual,
+          phone:          @request.user.phone_number,
+          latitude:       @request.source_location.latitude,
+          longitude:      @request.source_location.longitude,
+          location:       @request.source_location.address,
+          type:           "pick_up"
+        }
+        PrivatePub.publish_to "/valet/new", :request => request
+      else
         render json: {error: "Request not saved"}, status: :bad_request
       end
-      PrivatePub.publish_to "/valet/new", :request => 
-      {
-        id:             @request.id,
-        name:           "#{@request.user.first_name} #{@request.user.last_name}",
-        picture:        @request.user.profile_picture,
-        transmission:   @request.user.is_manual,
-        phone:          @request.user.phone_number,
-        latitude:       @request.source_location.latitude,
-        longitude:      @request.source_location.longitude,
-        location:       @request.source_location.address,
-        type:           "pick_up"
-      }
     else
       # location not save
       render json: {error: "Location not saved"}, status: :bad_request
@@ -52,23 +48,22 @@ class RequestsController < ApplicationController
 
   #valet puts their id into the request
   def valet_pick_up
-    valet = Valet.find(params[:valet_id])
     @request = Request.find(params[:request_id])
     if @request.valet_pick_up.nil?
-      @request.update(valet_pick_up: valet)
+      @request.update(valet_pick_up: Valet.find(params[:valet_id]))
       @request.pick_up_retrieved!
       # Generate authentication code
       @request.generate_auth_code("pick_up")
       # find the nearest parking lot
       @request.find_nearest_parking
-      PrivatePub.publish_to "/user/#{@request.id}", :valet => 
-      {
+      pick_up_valet = {
         id:       @request.id,
         valet_id: @request.valet_pick_up.id,
         name:     "#{@request.valet_pick_up.first_name} #{@request.valet_pick_up.last_name}",
         picture:  @request.valet_pick_up.profile_picture,
         phone:    @request.valet_pick_up.phone_number
       }
+      PrivatePub.publish_to "/user/#{@request.id}", :valet => pick_up_valet
     else
       render 'record_already_responded', status: :bad_request
     end
@@ -77,8 +72,7 @@ class RequestsController < ApplicationController
   #user confirms auth code
   def car_pick_up
     @request = User.find(params[:user_id]).requests.find(params[:request_id])
-    auth_code = request_auth_code_params[:auth_code]
-    if @request.auth_code_check?(auth_code, "pick_up")
+    if @request.auth_code_check?(request_auth_code_params[:auth_code], "pick_up")
       @request.record_time("pick_up")
       @request.auth_code_matched_pick_up!
     else
@@ -88,32 +82,27 @@ class RequestsController < ApplicationController
 
   #valet has parked the car
   def car_parked
-    valet = Valet.find(params[:valet_id])
-    bay_number = valet_car_parked_params[:bay_number]
-    @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', valet.id, params[:request_id])
-    @request.update(bay_number: bay_number)
+    @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', Valet.find(params[:valet_id]).id, params[:request_id])
+    @request.update(bay_number: valet_car_parked_params[:bay_number])
     @request.keys_dropped!
-    #let user know card is parked
-    PrivatePub.publish_to "/user/#{@request.id}", :parking_spot => 
-    {
+    parking_spot = {
       latitude:   @request.parking_location.latitude,
       longitude:  @request.parking_location.longitude,
       address:    @request.parking_location.address
     }
+    PrivatePub.publish_to "/user/#{@request.id}", :parking_spot => parking_spot 
     render 'okay'
   end
+
   #user requests drop off
   def request_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:request_id])
-    destination = request_create_params
     @request.drop_off_requested!
-    destination_location = Location.new(latitude: destination[:latitude], longitude: destination[:longitude])
+    destination_location = Location.new(latitude: request_create_params[:latitude], longitude: request_create_params[:longitude])
     @request.update(destination_location: destination_location)
     @request.record_time
     @request.calculate_total
-
-    PrivatePub.publish_to "/valet/new", :valet =>
-    {
+    request_information = {
       id:                         @request.id,
       name:                       "#{@request.user.first_name} #{@request.user.last_name}",
       picture:                    @request.user.profile_picture,
@@ -127,28 +116,27 @@ class RequestsController < ApplicationController
       parking_location_location:  @request.parking_location.address,
       type:                       "drop_off"
     }
+    PrivatePub.publish_to "/valet/new", :valet => request_information
   end
   #valet accepts drop off
   def valet_drop_off
-    valet = Valet.find(params[:valet_id])
     @request = Request.find(params[:request_id])
     @request.drop_off_retrieved!
-    @request.update(valet_drop_off: valet)
+    @request.update(valet_drop_off: Valet.find(params[:valet_id]))
     @request.calculate_total
-    PrivatePub.publish_to "/user/#{@request.id}", :valet => 
-    {
+    valet_information = {
       id:       @request.id,
       valet_id: @request.valet_drop_off.id,
       name:     "#{@request.valet_drop_off.first_name} #{@request.valet_drop_off.last_name}",
       picture:  @request.valet_drop_off.profile_picture,
       phone:    @request.valet_drop_off.phone_number
     }
+    PrivatePub.publish_to "/user/#{@request.id}", :valet => valet_information
   end
 
   #valet has arrived at the car
   def valet_delivery
-    valet = Valet.find(params[:valet_id])
-    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:request_id])
+    @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', Valet.find(params[:valet_id]), params[:request_id])
     @request.generate_auth_code
     @request.valet_on_route_drop_off!
     PrivatePub.publish_to "/user/#{@request.id}", :status => @request.status
@@ -157,8 +145,7 @@ class RequestsController < ApplicationController
   #user keys in auth code
   def car_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:request_id])
-    auth_code = request_auth_code_params[:auth_code]
-    if @request.auth_code_check?(auth_code)
+    if @request.auth_code_check?(request_auth_code_params[:auth_code])
       @request.auth_code_matched_drop_off!
       PrivatePub.publish_to "/valet/#{@request.id}", :status => @request.status
       render 'okay'
