@@ -20,6 +20,18 @@ class RequestsController < ApplicationController
       unless @request.save 
         render json: {error: "Request not saved"}, status: :bad_request
       end
+      PrivatePub.publish_to "/valet/new", :request => 
+      {
+        id:             @request.id,
+        name:           "#{@request.user.first_name} #{@request.user.last_name}",
+        picture:        @request.user.profile_picture,
+        transmission:   @request.user.is_manual,
+        phone:          @request.user.phone_number,
+        latitude:       @request.source_location.latitude,
+        longitude:      @request.source_location.longitude,
+        location:       @request.source_location.address,
+        type:           "pick_up"
+      }
     else
       # location not save
       render json: {error: "Location not saved"}, status: :bad_request
@@ -42,6 +54,14 @@ class RequestsController < ApplicationController
       @request.generate_auth_code("pick_up")
       # find the nearest parking lot
       @request.find_nearest_parking
+      PrivatePub.publish_to "/user/#{@request.id}", :valet => 
+      {
+        id:       @request.id,
+        valet_id: @request.valet_pick_up.id,
+        name:     "#{@request.valet_pick_up.first_name} #{@request.valet_pick_up.last_name}",
+        picture:  @request.valet_pick_up.profile_picture,
+        phone:    @request.valet_pick_up.phone_number
+      }
     else
       render 'record_already_responded', status: :bad_request
     end
@@ -66,6 +86,13 @@ class RequestsController < ApplicationController
     @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', valet.id, params[:request_id])
     @request.update(bay_number: bay_number)
     @request.keys_dropped!
+    #let user know card is parked
+    PrivatePub.publish_to "/user/#{@request.id}", :parking_spot => 
+    {
+      latitude:   @request.parking_lot.latitude,
+      longitude:  @request.parking_lot.longitude,
+      address:    @request.parking_lot.address
+    }
     render 'okay'
   end
   #user requests drop off
@@ -77,6 +104,22 @@ class RequestsController < ApplicationController
     @request.update(destination_location: destination_location)
     @request.record_time
     @request.calculate_total
+
+    PrivatePub.publish_to "/valet/new", :valet =>
+    {
+      id:                         @request.id,
+      name:                       "#{@request.user.first_name} #{@request.user.last_name}",
+      picture:                    @request.user.profile_picture,
+      transmission:               @request.user.is_manual,
+      phone:                      @request.user.phone_number,
+      destination_latitude:       @request.destination_location.latitude,
+      destination_longitude:      @request.destination_location.longitude,
+      destination_location:       @request.destination_location.address,
+      parking_lot_latitude:       @request.parking_lot.latitude,
+      parking_lot_longitude:      @request.parking_lot.longitude,
+      parking_lot_location:       @request.parking_lot.address,
+      type:                       "drop_off"
+    }
   end
   #valet accepts drop off
   def valet_drop_off
@@ -85,6 +128,14 @@ class RequestsController < ApplicationController
     @request.drop_off_retrieved!
     @request.update(valet_drop_off: valet)
     @request.calculate_total
+    PrivatePub.publish_to "/user/#{@request.id}", :valet => 
+    {
+      id:       @request.id,
+      valet_id: @request.valet_drop_off.id,
+      name:     "#{@request.valet_drop_off.first_name} #{@request.valet_drop_off.last_name}",
+      picture:  @request.valet_drop_off.profile_picture,
+      phone:    @request.valet_drop_off.phone_number
+    }
   end
 
   #valet has arrived at the car
@@ -93,6 +144,7 @@ class RequestsController < ApplicationController
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', valet.id, params[:request_id])
     @request.generate_auth_code
     @request.valet_on_route_drop_off!
+    PrivatePub.publish_to "/user/#{@request.id}", :status => @request.status
   end
 
   #user keys in auth code
@@ -101,6 +153,7 @@ class RequestsController < ApplicationController
     auth_code = request_auth_code_params[:auth_code]
     if @request.auth_code_check?(auth_code)
       @request.auth_code_matched_drop_off!
+      PrivatePub.publish_to "/valet/#{@request.id}", :status => @request.status
       render 'okay'
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request      
