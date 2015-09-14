@@ -1,3 +1,5 @@
+require 'private_pub'
+PrivatePub.load_config(File.expand_path("../../../config/private_pub.yml", __FILE__), ENV["RAILS_ENV"] || "development")
 class RequestsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, :with => :record_not_found
   rescue_from AASM::InvalidTransition, :with => :invalid_state

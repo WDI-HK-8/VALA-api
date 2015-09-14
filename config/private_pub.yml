@@ -5,6 +5,6 @@ test:
   server: "http://localhost:9292/faye"
   secret_token: "secret"
 production:
-  server: ENV['PRIVATE_PUB_URL']
-  secret_token: ENV['PRIVATE_PUB_TOKEN']
+  server: <%= ENV["FAYE_PRODUCTION_URL"] %>
+  secret_token: <%= ENV["FAYE_SECRET_TOKEN"] %>
   signature_expiration: 3600 # one hour
