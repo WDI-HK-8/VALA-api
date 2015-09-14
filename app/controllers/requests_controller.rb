@@ -116,7 +116,7 @@ class RequestsController < ApplicationController
       parking_location_location:  @request.parking_location.address,
       type:                       "drop_off"
     }
-    PrivatePub.publish_to "/valet/new", :valet => request_information
+    PrivatePub.publish_to "/valet/new", :request => request_information
   end
   #valet accepts drop off
   def valet_drop_off
