@@ -39,6 +39,7 @@ Rails.application.routes.draw do
 
     scope 'requests/' do
       get 'pickup' => 'requests#index_pick_up'
+      get 'dropoff' => 'requests#index_drop_off'
       put ':id/cancel_request' => 'requests#cancel_request'
       patch ':id/cancel_request' => 'requests#cancel_request'
     end
