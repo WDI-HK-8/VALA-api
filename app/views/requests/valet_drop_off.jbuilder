@@ -1,5 +1,4 @@
 json.request_id   @request.id
-
 json.user do
   json.id             @request.user.id
   json.name           "#{@request.user.first_name} #{@request.user.last_name}"
