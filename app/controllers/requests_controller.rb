@@ -96,9 +96,9 @@ class RequestsController < ApplicationController
     #let user know card is parked
     PrivatePub.publish_to "/user/#{@request.id}", :parking_spot => 
     {
-      latitude:   @request.parking_lot.latitude,
-      longitude:  @request.parking_lot.longitude,
-      address:    @request.parking_lot.address
+      latitude:   @request.parking_location.latitude,
+      longitude:  @request.parking_location.longitude,
+      address:    @request.parking_location.address
     }
     render 'okay'
   end
