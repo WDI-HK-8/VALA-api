@@ -50,8 +50,8 @@ class RequestsController < ApplicationController
   def valet_pick_up
     @request = Request.find(params[:request_id])
     if @request.valet_pick_up.nil?
-      @request.update(valet_pick_up: Valet.find(params[:valet_id]))
       @request.pick_up_retrieved!
+      @request.update(valet_pick_up: Valet.find(params[:valet_id]))
       # Generate authentication code
       @request.generate_auth_code("pick_up")
       # find the nearest parking lot
@@ -84,20 +84,19 @@ class RequestsController < ApplicationController
   def car_parked
     @request = Request.find_by!('valet_pick_up_id = ? AND id = ?', Valet.find(params[:valet_id]).id, params[:request_id])
     @request.update(bay_number: valet_car_parked_params[:bay_number])
-    @request.keys_dropped!
     parking_spot = {
       latitude:   @request.parking_location.latitude,
       longitude:  @request.parking_location.longitude,
       address:    @request.parking_location.address
     }
     PrivatePub.publish_to "/user/#{@request.id}", :parking_spot => parking_spot 
+    @request.keys_dropped!
     render 'okay'
   end
 
   #user requests drop off
   def request_drop_off
     @request = User.find(params[:user_id]).requests.find(params[:request_id])
-    @request.drop_off_requested!
     destination_location = Location.new(latitude: request_create_params[:latitude], longitude: request_create_params[:longitude])
     @request.update(destination_location: destination_location)
     @request.record_time
@@ -117,11 +116,11 @@ class RequestsController < ApplicationController
       type:                       "drop_off"
     }
     PrivatePub.publish_to "/valet/new", :request => request_information
+    @request.drop_off_requested!
   end
   #valet accepts drop off
   def valet_drop_off
     @request = Request.find(params[:request_id])
-    @request.drop_off_retrieved!
     @request.update(valet_drop_off: Valet.find(params[:valet_id]))
     @request.calculate_total
     valet_information = {
@@ -132,22 +131,23 @@ class RequestsController < ApplicationController
       phone:    @request.valet_drop_off.phone_number
     }
     PrivatePub.publish_to "/user/#{@request.id}", :valet => valet_information
+    @request.drop_off_retrieved!
   end
 
   #valet has arrived at the car
   def valet_delivery
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', Valet.find(params[:valet_id]), params[:request_id])
-    @request.generate_auth_code
     @request.valet_on_route_drop_off!
     PrivatePub.publish_to "/user/#{@request.id}", :request => {auth_code: @request.auth_code_drop_off} 
+    @request.generate_auth_code
   end
 
   #user keys in auth code
   def car_drop_off
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', Valet.find(params[:valet_id]), params[:request_id])
     if @request.auth_code_check?(request_auth_code_params[:auth_code])
-      @request.auth_code_matched_drop_off!
       PrivatePub.publish_to "/user/#{@request.id}", :status => @request.status
+      @request.auth_code_matched_drop_off!
       render 'okay'
     else
       render json: {error: "Incorrect auth code"}, status: :bad_request      

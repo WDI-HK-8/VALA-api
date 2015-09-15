@@ -55,9 +55,9 @@ class Request < ActiveRecord::Base
   end
 
   def cancel
-    if self.status == "valet_pick_up" || "request_pick_up"
+    if self.status == ("valet_pick_up" || "request_pick_up")
       self.cancel_pick_up!
-    elsif self.status == "request_drop_off" || "valet_drop_off"
+    elsif self.status == ("request_drop_off" || "valet_drop_off")
       self.cancel_drop_off!
     end
   end
