@@ -1,3 +1,4 @@
+json.request_id               @request.id
 json.valet_id_pick_up @request.valet_pick_up.id
 json.user do
   json.id             @request.user.id
