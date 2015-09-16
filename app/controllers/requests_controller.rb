@@ -137,9 +137,9 @@ class RequestsController < ApplicationController
   #valet has arrived at the car
   def valet_delivery
     @request = Request.find_by!('valet_drop_off_id = ? AND id = ?', Valet.find(params[:valet_id]), params[:request_id])
-    @request.valet_on_route_drop_off!
-    PrivatePub.publish_to "/user/#{@request.id}", :request => {auth_code: @request.auth_code_drop_off} 
     @request.generate_auth_code
+    PrivatePub.publish_to "/user/#{@request.id}", :request => {auth_code: @request.auth_code_drop_off} 
+    @request.valet_on_route_drop_off!
   end
 
   #user keys in auth code
